@@ -1,7 +1,7 @@
 #ifndef NETFLOW_TABLE_H
 #define NETFLOW_TABLE_H
 
-#define TABLE_INITIAL_SIZE 1
+#define TABLE_INITIAL_SIZE 1024
 
 typedef struct netflow_table_key {
     uint8_t proto;
@@ -32,7 +32,7 @@ typedef struct netflow_hashBucket {
 
 struct netflow_table {
    uint32_t n_entries;
-   hashBucket_t *array;
+   hashBucket_t **array;
 };
 
 /* Functions */

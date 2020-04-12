@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include <arpa/inet.h>
 
 #include "netflow-table.h"
@@ -16,8 +17,8 @@ struct netflow_table* netflow_table_init (void) {
    table            = malloc (sizeof (struct netflow_table));
    if(table == NULL)
       exit(1);
-   table->array     = NULL;// malloc (sizeof (hashBucket_t) * TABLE_INITIAL_SIZE); /* allocates each one in the insert as needed */
-  // bzero (table->array, sizeof (hashBucket_t));
+   table->array     = malloc (sizeof (hashBucket_t *) * TABLE_INITIAL_SIZE); /* allocates each one in the insert as needed */
+   bzero (table->array, sizeof (hashBucket_t *) * TABLE_INITIAL_SIZE);
    table->n_entries = TABLE_INITIAL_SIZE;
 
    return table;
@@ -84,7 +85,7 @@ void netflow_table_insert (struct netflow_table *table, netflow_key_t *key, netf
 
    /* there might be some weird c thing here cause it was declared as a 
       pointer (**) but accessed as an array so idk */
-   bucket = table->array;
+   bucket = table->array[idx];
    previous_pointer = bucket;
 
    /* MAKE SURE ARRAY IS INITIALISED IN INIT FUNCTION */
@@ -121,7 +122,7 @@ void netflow_table_insert (struct netflow_table *table, netflow_key_t *key, netf
       if (notfound)
          previous_pointer->next = new_bucket;
       else
-         table->array = new_bucket;
+         table->array[idx] = new_bucket;
    }
 }
 
@@ -145,7 +146,7 @@ void netflow_table_print_stats (struct netflow_table *table) {
    printf ("\nprinting flow table statistics\n");
    for (unsigned int i = 0; i < table->n_entries; i++) {
       //printf("i=%d\n", i);
-		bucket = table->array;
+		bucket = table->array[i];
 		while (bucket != NULL) {
          //printf ("got here\n");
          total_bytes += bucket->bytesSent;

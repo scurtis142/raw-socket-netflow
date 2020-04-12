@@ -81,7 +81,7 @@ int main(int argc,char **argv)
       rval=recvfrom(sock,buf,sizeof(buf),0,(struct sockaddr*)&rcvaddr,&len);
       if(rval>0)
       {
-         printf("Packet received: %d\n", count++);
+         /* printf("Packet received: %d\n", count++); */
          if (get_netflow_k_v (buf, len, &key, &value))
             netflow_table_insert(table, &key, &value);
       }

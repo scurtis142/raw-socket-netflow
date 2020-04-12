@@ -17,9 +17,6 @@
 #include <pcap/pcap.h>
 #include <math.h>
 #include <sys/time.h>
-//#define Mask 0x0000FFFF
-//#define FOUR 0x0000FF00
-//#define FIVE 0x000F0000
 
 #include "netflow-table.h"
 
@@ -30,8 +27,6 @@
 int rawSocket();
 int setPromisc(char *,int *);
 bool loop;
-
-//int rval;                 //the number of receiving bytes,we need a local varvible
 
 /* control-C handler */
 static void
@@ -120,7 +115,6 @@ int setPromisc(char *enterface,int *sock)
    struct ifreq ifr;
    strcpy(ifr.ifr_name, enterface);
    ifr.ifr_flags=IFF_UP|IFF_PROMISC|IFF_BROADCAST|IFF_RUNNING;
-   //ifr.ifr_flags |= IFF_PROMISC;      // this is wrong code
    if(ioctl(*sock,SIOCSIFFLAGS,&ifr)==-1)
    {
       perror("set 'eth' to promisc model failed\n"); //cant write  '%s',enterface  why?

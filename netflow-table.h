@@ -2,6 +2,7 @@
 #define NETFLOW_TABLE_H
 
 #define TABLE_INITIAL_SIZE 1024
+#define EXPORT_BUF_INITAL_SIZE 1024
 
 typedef struct netflow_table_key {
     uint8_t proto;
@@ -42,5 +43,6 @@ void netflow_table_insert (struct netflow_table *table, netflow_key_t *key, netf
 /* void netflow_table_free (struct netflow_table *table); */
 /* void netflow_table_print (struct netflow_table *table); */
 void netflow_table_print_stats (struct netflow_table *table);
+void netflow_table_export_to_file (struct netflow_table *table, const char *filename);
 
 #endif

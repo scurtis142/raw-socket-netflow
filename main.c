@@ -17,6 +17,7 @@
 #include <pcap/pcap.h>
 #include <math.h>
 #include <sys/time.h>
+#include <pthread.h>
 
 #include "netflow-table.h"
 
@@ -39,6 +40,15 @@ sigint_h(int sig)
    loop = false;
 }
 
+void*
+export_thread_func (void* arg)
+{
+   struct netflow_table *table = (struct netflow_table *) arg;
+   while (1) {
+      sleep (1);
+      netflow_table_export_to_file (table, "/tmp/netflow.csv");
+   }
+}
 
 int main(int argc,char **argv)
 {
@@ -49,6 +59,8 @@ int main(int argc,char **argv)
    }
 
    struct netflow_table *table = netflow_table_init ();
+   pthread_t exp_thread;
+   pthread_create(&exp_thread, NULL, export_thread_func, (void *) table);
 
    int sock;
    struct sockaddr_ll rcvaddr;
@@ -87,9 +99,10 @@ int main(int argc,char **argv)
       }
 
       else
-         printf("recvfrom failed!!!\n");	
+         printf("recvfrom failed!!!\n");
    }
    netflow_table_print_stats (table);
+   netflow_table_export_to_file (table, "/tmp/netflow.csv");
    return 0;
 }
 

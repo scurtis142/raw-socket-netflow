@@ -53,9 +53,9 @@ int get_netflow_k_v (const char *_p, int len, netflow_key_t *key, netflow_value_
          if (0x06 == *p) {//if protocol = tcp
             key->proto = *p;
             p+=3;//pointing to src
-            key->ip_src = ntohl(*(uint32_t *)p);
+            key->ip_src = *(uint32_t *)p;
             p+=4;
-            key->ip_dst = ntohl(*(uint32_t *)p);
+            key->ip_dst = *(uint32_t *)p;
             p+=4;
             key->port_src = ntohs(*(uint16_t *)p);
             p+=2;
@@ -187,6 +187,8 @@ void netflow_table_export_to_file (struct netflow_table *table, const char *file
    hashBucket_t *bucket;
    struct in_addr src_addr;
    struct in_addr dst_addr;
+   char src_ip_str[16];
+   char dst_ip_str[16];
 
    if ((buf = malloc (sizeof (char) * buf_size)) == NULL) {
       printf ("malloc failed with %s\n", strerror (errno));
@@ -208,14 +210,19 @@ void netflow_table_export_to_file (struct netflow_table *table, const char *file
                buf_size *= 2;
             }
          }
-         src_addr.s_addr = ntohl(bucket->ip_src);
-         dst_addr.s_addr = ntohl(bucket->ip_dst);
+         /* Need to copy the string here rather than use directly in the sprintf
+            because inet_ntoa return a static buffer that get written over on
+            subsequent calls */
+         src_addr.s_addr = bucket->ip_src;
+         dst_addr.s_addr = bucket->ip_dst;
+         strcpy(src_ip_str, inet_ntoa(src_addr));
+         strcpy(dst_ip_str, inet_ntoa(dst_addr));
 
          snp_res = snprintf ((buf + buf_end_offset), 91, "%s,%s,%d,%d,%d,%lu,%lu\n",
-               inet_ntoa(src_addr),
-               inet_ntoa(dst_addr),
-               ntohs(bucket->port_src),
-               ntohs(bucket->port_dst),
+               src_ip_str,
+               dst_ip_str,
+               bucket->port_src,
+               bucket->port_dst,
                bucket->proto,
                bucket->bytesSent,
                bucket->pktSent);

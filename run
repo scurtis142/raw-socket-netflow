@@ -1,0 +1,2 @@
+#! /bin/bash
+./mypack enp3s0

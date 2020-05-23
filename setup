@@ -1,0 +1,3 @@
+#! /bin/bash
+cd /home/simon/Documents/Thesis/dpdk-18.11.2/dpdk-stable-18.11.2/usertools
+./dpdk-devbind.py --bind=ixgbe 0000:03:00.0
